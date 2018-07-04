@@ -2,6 +2,7 @@ package online.omnia.propellerads;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonSyntaxException;
 
 import java.sql.Date;
 import java.util.List;
@@ -22,8 +23,13 @@ public class Main {
                     + accountsEntity.getApiKey() +
                     "&date_range=yesterday&params[stat_columns][show,click,convers,convrate,cpm,ctr,profit]=show,click,convers,convrate,cpm,ctr,profit");
             System.out.println(answer);
-            jsonStatistics = gson.fromJson(answer, List.class);
-            answer = HttpMethodUtils.getMethod("http://report.propellerads.com/?action=getAffiliates&key=" + accountsEntity.getApiKey());
+            try {
+                jsonStatistics = gson.fromJson(answer, List.class);
+                answer = HttpMethodUtils.getMethod("http://report.propellerads.com/?action=getAffiliates&key=" + accountsEntity.getApiKey());
+            } catch (Exception e) {
+                Utils.writeLog(e.toString());
+                continue;
+            }
             System.out.println(answer);
             SourceStatisticsEntity sourceStatisticsEntity;
             for (JsonStatistic jsonStatistic : jsonStatistics) {
